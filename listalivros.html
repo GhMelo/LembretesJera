@@ -1,0 +1,154 @@
+<html>
+
+
+
+<head>
+
+
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.4"></script>
+
+
+    
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+ 
+     
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  
+</head>
+
+<body>
+    <img src="Livro2.png" alt="Livro Icone" style="width:70px;height:70px;">
+
+    <div id="app">
+
+        <form >
+
+            <div class="form-group">
+                <label> Nome </label>
+                <input type="text" v-model="livro.nome">
+            </div>
+
+            <div class="form-group">
+                <label> Ler no Dia  </label>
+                <input type="text" v-model="livro.data">
+            </div>
+
+            <div class="form-group">
+                <label> Total de Paginas  </label>
+                <input type="text" v-model="livro.totalpaginas">
+            </div>
+             <div class="form-group">
+                 <label> Repetir: </label>
+                <select v-model="livro.repeticoes">
+                    <option disabled> .:Escolha:. </option>
+                    <option v-for="r in repeticoes"  v-bind:value="r">  {{r.dias}} </option>
+                    
+                </select>
+            </div>
+
+             <button type="button" v-on:click="novo" class="btn"> Novo</button>
+            <button type="button" v-on:click="salvar" class="btn btn-primary"> Salvar</button>
+
+
+        </form>
+
+        <div class="container">
+
+            <div class="row" style="list-style-type: none" v-for="livro in listalivros">
+                <div class="col">
+                    {{ livro.nome }} 
+                </div>
+                <div class="col">
+                    {{ livro.data }} 
+                </div>
+                <div class="col">
+                    {{ livro.totalpaginas }} 
+                </div>
+                <div class="col">
+                      {{ livro.repeticoes.dias }}       
+                </div>
+                
+                <div class="col">
+                    <button type="button" v-on:click="excluir(livro)" class="btn"> Excluir </button>
+                    <button type="button" v-on:click="alterar(livro)" class="btn"> Alterar </button>
+                </div>
+            </div>
+            </li>
+
+        </div>
+
+    </div>
+
+</body>
+
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            listalivros: [],
+            livro: {id:'',  nome: '', data:'', totalpaginas:''},
+            repeticoes: []
+        },
+        created: function () {
+            this.$http.get("http://localhost:8081/livroscontroller").then(function (response) {
+                this.listalivros = response.body;
+            }, function (response) {
+                console.log("nao funcionou")
+            })
+           
+        ,
+        this.$http.get("http://localhost:8081/repeticoescontroller").then(function (response) {
+                this.repeticoes = response.body;
+            }, function (response) {
+                console.log("nao funcionou")
+            })
+        }
+         ,
+        methods: {
+            salvar: function () {
+               
+               if (this.livro.id==""){
+               
+                    this.$http.post("http://localhost:8081/livroscontroller", this.livro).then(function (response) {
+                        this.listalivros.push(response.body);
+                    }, function (response) {
+                        console.log("nao funcionou")
+                    })
+               }else {
+                    this.$http.put("http://localhost:8081/livroscontroller", this.livro).then(function (response) {
+                       
+                        index = this.listalivros.indexOf(this.livroAlterar);
+                         this.listalivros.splice(index, 1, response.body)   
+                      
+                        
+                    }, function (response) {
+                        console.log("nao funcionou")
+                    })
+               }
+            },
+            excluir: function (livroExcluir) {
+                if (window.confirm("Tem Certeza que deseja remover o Livro " + livroExcluir.nome + "? " )){
+                    this.$http.delete("http://localhost:8081/livroscontroller/" + livroExcluir.id).then(function (response) {
+                        var indice = this.listalivros.indexOf(livroExcluir);
+                        this.listalivros.splice(indice, 1);
+                    }, function (response) {
+                        console.log("nao funcionou")
+                    })
+                }
+            }, 
+            alterar: function (livroAlterar) {
+                this.livroAlterar = livroAlterar;
+                  this.livro = Vue.util.extend({}, livroAlterar);  
+            }
+            , 
+            novo:function (){
+                this.livro= {id:'',  nome: '', data: '' }
+            }
+        }
+    });
+   
+</script>
+
+</html>
