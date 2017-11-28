@@ -1,9 +1,6 @@
 package com.lembreteslivros.Model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.*;
 
 @Entity
 
@@ -15,23 +12,46 @@ public class ListaLivros {
     @SequenceGenerator(name = "seq_livros", sequenceName = "seq_livros")
     @Id
 
-    private int id;
-    private String nomeLivro;
 
-    public int getId() {
+    private Integer id;
+
+
+    @JoinColumn
+    @ManyToOne
+    private Repeticoes repeticoes;
+    public Repeticoes getRepeticoes() {
+        return repeticoes;
+    }
+
+    public void setRepeticoes(Repeticoes repeticoes) {
+        this.repeticoes = repeticoes;
+    }
+
+    public Integer getTotalpaginas() {
+
+        return totalpaginas;
+    }
+
+    public void setTotalpaginas(Integer totalpaginas) {
+        this.totalpaginas = totalpaginas;
+    }
+
+    private Integer totalpaginas;
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getNomeLivro() {
-        return nomeLivro;
+    public String getNome() {
+        return nome;
     }
 
-    public void setNomeLivro(String nomeLivro) {
-        this.nomeLivro = nomeLivro;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getData() {
@@ -42,7 +62,16 @@ public class ListaLivros {
         this.data = data;
     }
 
+    private String nome;
     private String data;
+    public ListaLivros() {
+
+    }
+
+    public ListaLivros(Integer id, String nome) {
+        this.id = id;
+        this.nome = nome;
+    }
 
 
 
